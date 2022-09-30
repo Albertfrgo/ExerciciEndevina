@@ -4,9 +4,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -84,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
+    }
+
+    public void premerRanking(View view1){
+        Log.i("INFO", "S'ha apretat el boto de ranking");
+        Intent obrirRecords=new Intent(this, RecordsActivity.class);
+        startActivity(obrirRecords);
     }
 }
 
