@@ -1,7 +1,9 @@
 package com.example.exerciciendevina;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.method.ScrollingMovementMethod;
@@ -18,12 +20,14 @@ public class MainActivity extends AppCompatActivity {
     int contadorIntents=0;
     Random aleatori=new Random();
     boolean jocActiu=true;
-    int numeroEndevinar= aleatori.nextInt(100);
+    int numeroEndevinar= aleatori.nextInt(100);;
     String numEndStr=String.valueOf(numeroEndevinar);
     //Per poder utilitzarlos primer instancia els EditText i TextView fora del onCreate i alla els defineixo
     EditText inputUsuari;
     TextView vistaContador;
     TextView vistaPista;
+    AlertDialog.Builder constructorDialeg;
+    AlertDialog dialeg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,33 +40,50 @@ public class MainActivity extends AppCompatActivity {
         vistaPista=findViewById(R.id.pistaText);
         vistaPista.setMovementMethod(new ScrollingMovementMethod());
 
-//      De momento mostra el numero que s'ha d'endevinar
-        vistaPista.setText(Integer.toString(numeroEndevinar));
-    }
+        constructorDialeg=new AlertDialog.Builder(MainActivity.this);
+        constructorDialeg.setMessage("Has endevinat el numero").setTitle("CORRECTE").setPositiveButton("ACCEPTAR", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialogInterface, int i) {
+                int numeroEndevinar= aleatori.nextInt(100);
+                vistaPista.setText("");
+            }
+        });
 
-    public void premerBoto(View view) {
-        String textToast="Boto apretat";
-        Toast.makeText(getApplicationContext(),textToast,Toast.LENGTH_SHORT).show();
-        Editable numeroEntrat= inputUsuari.getText();
-        if(inputUsuari.getText().toString().equals("")==false){
-            int numeroInt=Integer.parseInt(numeroEntrat.toString());
-            contadorIntents++;
-            vistaContador.setText(Integer.toString(contadorIntents));
-            if(numeroInt==numeroEndevinar){
-                vistaPista.setText("\nHAS ENCERTAT EL NUMERO!!!");
-            }else if(numeroInt<numeroEndevinar){
-                //vistaPista.setText("\nEl numero "+numeroEntrat+" es inferior");
-                vistaPista.append("\nEl numero "+numeroEntrat+" es inferior");
-                inputUsuari.setText("");
-            }else if(numeroInt>numeroEndevinar) {
-                //vistaPista.setText("\nEl numero "+numeroEntrat + " es superior");
-                vistaPista.append("\nEl numero "+numeroEntrat + " es superior");
-                inputUsuari.setText("");
+        dialeg=constructorDialeg.create();
+
+            vistaPista.setText("");
+//      De momento mostra el numero que s'ha d'endevinar
+            vistaPista.setText(Integer.toString(numeroEndevinar));
         }
 
-        }else{
-        vistaPista.append("\nNo has entrat un numero");
-        inputUsuari.setText("");
+    public void premerBoto(View view) {
+        if(jocActiu){
+            Editable numeroEntrat= inputUsuari.getText();
+            if(inputUsuari.getText().toString().equals("")==false){
+                int numeroInt=Integer.parseInt(numeroEntrat.toString());
+                contadorIntents++;
+                vistaContador.setText(Integer.toString(contadorIntents));
+                if(numeroInt==numeroEndevinar){
+                    vistaPista.setText("\nHAS ENCERTAT EL NUMERO!!!");
+                    jocActiu=false;
+                    dialeg.show();
+                }else if(numeroInt<numeroEndevinar){
+                    //vistaPista.setText("\nEl numero "+numeroEntrat+" es inferior");
+                    vistaPista.append("\nEl numero "+numeroEntrat+" es inferior");
+                    Toast.makeText(getApplicationContext(),"El numero "+numeroEntrat+" es inferior",Toast.LENGTH_SHORT).show();
+                    inputUsuari.setText("");
+                }else if(numeroInt>numeroEndevinar) {
+                    //vistaPista.setText("\nEl numero "+numeroEntrat + " es superior");
+                    vistaPista.append("\nEl numero "+numeroEntrat + " es superior");
+                    Toast.makeText(getApplicationContext(),"El numero "+numeroEntrat + " es superior",Toast.LENGTH_SHORT).show();
+                    inputUsuari.setText("");
+                }
+
+            }else{
+                vistaPista.append("\nNo has entrat un numero");
+                inputUsuari.setText("");
+
+            }
         }
     }
 }
+
