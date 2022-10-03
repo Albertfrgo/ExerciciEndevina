@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     public void premerRanking(View view1){
         Log.i("INFO", "S'ha apretat el boto de ranking");
         Intent obrirRecords=new Intent(this, RecordsActivity.class);
+        obrirRecords.putExtra("contadorIntents", contadorIntents);
         startActivity(obrirRecords);
     }
 }
