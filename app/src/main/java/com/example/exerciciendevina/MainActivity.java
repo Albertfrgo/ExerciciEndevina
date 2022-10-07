@@ -30,9 +30,11 @@ public class MainActivity extends AppCompatActivity {
     TextView vistaPista;
     AlertDialog.Builder constructorDialeg;
     AlertDialog dialeg;
+    boolean partidaJugada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        partidaJugada=false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                     vistaPista.setText("\nHAS ENCERTAT EL NUMERO!!!");
                     jocActiu=false;
                     dialeg.show();
+                    partidaJugada=true;
                 }else if(numeroInt<numeroEndevinar){
                     //vistaPista.setText("\nEl numero "+numeroEntrat+" es inferior");
                     vistaPista.append("\nEl numero "+numeroEntrat+" es inferior");
@@ -91,7 +94,11 @@ public class MainActivity extends AppCompatActivity {
     public void premerRanking(View view1){
         Log.i("INFO", "S'ha apretat el boto de ranking");
         Intent obrirRecords=new Intent(this, RecordsActivity.class);
-        obrirRecords.putExtra("contadorIntents", contadorIntents);
+        String contString=Integer.toString(contadorIntents);
+        if (partidaJugada==true){
+            obrirRecords.putExtra("partidaJugada", partidaJugada);
+            obrirRecords.putExtra("contadorIntents", contString);
+        }
         startActivity(obrirRecords);
     }
 }
