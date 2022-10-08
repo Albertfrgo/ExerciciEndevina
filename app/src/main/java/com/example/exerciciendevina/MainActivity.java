@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import java.util.Random;
@@ -32,11 +33,20 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog dialeg;
     boolean partidaJugada;
 
+    boolean llistaIniciada=false;
+    ArrayList<RecordsActivity.Jugador> llistaJugadors;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         partidaJugada=false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Intent dadesActivity=getIntent();
+        llistaIniciada=dadesActivity.getBooleanExtra("llistaIniciada", false);
+        if(llistaIniciada==true){
+            llistaJugadors= (ArrayList<RecordsActivity.Jugador>) dadesActivity.getSerializableExtra("llistaJugadors");
+        }
 
         inputUsuari=findViewById(R.id.inputUsuari);
         vistaContador=findViewById(R.id.contIntents);
@@ -54,10 +64,12 @@ public class MainActivity extends AppCompatActivity {
 
         dialeg=constructorDialeg.create();
 
-            vistaPista.setText("");
-//      De momento mostra el numero que s'ha d'endevinar
-            vistaPista.setText(Integer.toString(numeroEndevinar));
-        }
+//      Es pot configurar perque mostri el numero a endevinar per probar
+        vistaPista.setText("");
+
+
+
+    }
 
     public void premerBoto(View view) {
         if(jocActiu){
@@ -98,8 +110,14 @@ public class MainActivity extends AppCompatActivity {
         if (partidaJugada==true){
             obrirRecords.putExtra("partidaJugada", partidaJugada);
             obrirRecords.putExtra("contadorIntents", contString);
+            obrirRecords.putExtra("llistaIniciada", llistaIniciada);
+            if(llistaIniciada==true){
+                obrirRecords.putExtra("llistaJugadors", llistaJugadors);
+            }
         }
         startActivity(obrirRecords);
+
     }
+
 }
 

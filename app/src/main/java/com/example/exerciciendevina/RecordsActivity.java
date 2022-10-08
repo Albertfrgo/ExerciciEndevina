@@ -18,6 +18,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 
 public class RecordsActivity extends AppCompatActivity {
@@ -26,34 +27,39 @@ public class RecordsActivity extends AppCompatActivity {
     Button botoTornar;
     Button botoEntrar;
     boolean jocJugat;
+    boolean llistaIniciada=false;
     String ultimaPuntuacio;
     ArrayList<Jugador> llistaJugadors=new ArrayList<Jugador>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        jocJugat=false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_records);
 
-        llistaJugadors.add(new Jugador("Sergiio", "5"));
-        llistaJugadors.add(new Jugador("Sergio", "6"));
-        llistaJugadors.add(new Jugador("Edu", "4"));
-
+        Intent dadesMainAct=getIntent();
+        jocJugat=dadesMainAct.getBooleanExtra("partidaJugada", false);
+        llistaIniciada=dadesMainAct.getBooleanExtra("llistaInciada", false);
         vistaJugadors=findViewById(R.id.vistaJugadors);
         vistaJugadors.setMovementMethod(new ScrollingMovementMethod());
         ultimJoc=findViewById(R.id.ultimJoc);
         botoEntrar=findViewById(R.id.botoEntrar);
 
-        mostrarJugadors();
-
-        Intent dadesMainAct=getIntent();
-        jocJugat=dadesMainAct.getBooleanExtra("partidaJugada", false);
         if(jocJugat==true){
             ultimaPuntuacio=dadesMainAct.getStringExtra("contadorIntents");
             ultimJoc.append(" "+ultimaPuntuacio);
         }else{
             ultimJoc.append(" "+"CAP RESULTAT");
         }
+        if(llistaIniciada==true){
+            llistaJugadors= (ArrayList<RecordsActivity.Jugador>) dadesMainAct.getSerializableExtra("llistaJugadors");
+        }else{
+            llistaJugadors.add(new Jugador("Irene", "7"));
+            llistaJugadors.add(new Jugador("Sergio", "8"));
+            llistaJugadors.add(new Jugador("Edu", "5"));
+            llistaIniciada=true;
+        }
+
+        mostrarJugadors();
 
     }
 
@@ -65,19 +71,38 @@ public class RecordsActivity extends AppCompatActivity {
             this.nom=nom;
             this.intents=intents;
         }
-
         public String getNom(){
             return nom;
         }
-
         public String getMinIntents(){
             return intents;
+        }
+        public int getMinimInteger(){
+            try{
+                return Integer.parseInt(intents);
+            }catch(Exception e){
+                return 0;
+            }
+        }
+    }
+
+    class ordJugadorsIntents implements Comparator<Jugador>{
+        public int compare(Jugador jug1, Jugador jug2) {
+            if (jug1.getMinimInteger()>jug2.getMinimInteger()){
+                return 1;
+            }else if(jug1.getMinimInteger()<jug2.getMinimInteger()){
+                return -1;
+            }else{
+                return 0;
+            }
         }
     }
 
     public void tornarJoc (View view1){
         Log.i("INFO", "S'ha apretat el boto de tornar");
         Intent obrirJoc=new Intent(RecordsActivity.this, MainActivity.class);
+        obrirJoc.putExtra("llistaJugadors", llistaJugadors);
+        obrirJoc.putExtra("llistaIniciada", llistaIniciada);
         startActivity(obrirJoc);
     }
 
@@ -115,14 +140,15 @@ public class RecordsActivity extends AppCompatActivity {
 
     public void mostrarJugadors(){
         vistaJugadors.setText("");
-        for(int i=0;i<llistaJugadors.size();i++){
+        /*for(int i=0;i<llistaJugadors.size();i++){
             for(int j=0;j<llistaJugadors.size();j++){
                 if(Integer.parseInt(llistaJugadors.get(j+1).getMinIntents())< Integer.parseInt(llistaJugadors.get(j).getMinIntents())){
                     Jugador jug=llistaJugadors.get(j);
                     llistaJugadors.set(j)=llistaJugadors.get(j+1);
                 }
             }
-        }
+        }*/
+        Collections.sort(llistaJugadors, new ordJugadorsIntents());
         for(Jugador jug:llistaJugadors){
             vistaJugadors.append(jug.getNom()+" - "+jug.getMinIntents()+"\n\n");
         }
