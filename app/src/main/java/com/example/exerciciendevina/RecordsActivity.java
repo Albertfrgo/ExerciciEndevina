@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
@@ -27,22 +29,28 @@ public class RecordsActivity extends AppCompatActivity {
     Button botoTornar;
     Button botoEntrar;
     boolean jocJugat;
-    boolean llistaIniciada=false;
+    boolean llistaIniciada;
     String ultimaPuntuacio;
+
     ArrayList<Jugador> llistaJugadors=new ArrayList<Jugador>();
+    ArrayList<String> nomsJugadors;
+    ArrayList<String> intentsJugadors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_records);
 
-        Intent dadesMainAct=getIntent();
-        jocJugat=dadesMainAct.getBooleanExtra("partidaJugada", false);
-        llistaIniciada=dadesMainAct.getBooleanExtra("llistaInciada", false);
+
         vistaJugadors=findViewById(R.id.vistaJugadors);
         vistaJugadors.setMovementMethod(new ScrollingMovementMethod());
         ultimJoc=findViewById(R.id.ultimJoc);
         botoEntrar=findViewById(R.id.botoEntrar);
+
+        //RECOLLIR DADES DE LA MAIN ACTIVITY
+        Intent dadesMainAct=getIntent();
+        jocJugat=dadesMainAct.getBooleanExtra("partidaJugada", false);
+        llistaIniciada=dadesMainAct.getBooleanExtra("llistaIniciadaMain", false);
 
         if(jocJugat==true){
             ultimaPuntuacio=dadesMainAct.getStringExtra("contadorIntents");
@@ -51,8 +59,11 @@ public class RecordsActivity extends AppCompatActivity {
             ultimJoc.append(" "+"CAP RESULTAT");
         }
         if(llistaIniciada==true){
-            llistaJugadors= (ArrayList<RecordsActivity.Jugador>) dadesMainAct.getSerializableExtra("llistaJugadors");
+            nomsJugadors=dadesMainAct.getStringArrayListExtra("nomsJugadors");
+            intentsJugadors=dadesMainAct.getStringArrayListExtra("intentsJugadors");
+            llistaJugadors=unirDadesJugadors(nomsJugadors, intentsJugadors);
         }else{
+            Log.i("INFO", "S'ha creat la llista **************************");
             llistaJugadors.add(new Jugador("Irene", "7"));
             llistaJugadors.add(new Jugador("Sergio", "8"));
             llistaJugadors.add(new Jugador("Edu", "5"));
@@ -98,11 +109,15 @@ public class RecordsActivity extends AppCompatActivity {
         }
     }
 
+    //CANVI A MAIN ACTIVITY I ENVIAR DADES
     public void tornarJoc (View view1){
         Log.i("INFO", "S'ha apretat el boto de tornar");
         Intent obrirJoc=new Intent(RecordsActivity.this, MainActivity.class);
-        obrirJoc.putExtra("llistaJugadors", llistaJugadors);
-        obrirJoc.putExtra("llistaIniciada", llistaIniciada);
+        nomsJugadors=obtenirNoms(llistaJugadors);
+        intentsJugadors=obtenirIntents(llistaJugadors);
+        obrirJoc.putStringArrayListExtra("nomsJugadors", nomsJugadors);
+        obrirJoc.putStringArrayListExtra("intentsJugadors", intentsJugadors);
+        obrirJoc.putExtra("llistaIniciadaRecords", llistaIniciada);
         startActivity(obrirJoc);
     }
 
@@ -152,5 +167,29 @@ public class RecordsActivity extends AppCompatActivity {
         for(Jugador jug:llistaJugadors){
             vistaJugadors.append(jug.getNom()+" - "+jug.getMinIntents()+"\n\n");
         }
+    }
+
+    public ArrayList<String> obtenirNoms(ArrayList<Jugador> llistaJugadors){
+        ArrayList<String> nomsJugadors=new ArrayList<String>();
+        for(int i=0;i<llistaJugadors.size();i++){
+            nomsJugadors.add(llistaJugadors.get(i).getNom());
+        }
+        return nomsJugadors;
+    }
+
+    public ArrayList<String> obtenirIntents(ArrayList<Jugador> llistaJugadors){
+        ArrayList<String> intentsJugadors=new ArrayList<String>();
+        for(int i=0;i<llistaJugadors.size();i++){
+            intentsJugadors.add(llistaJugadors.get(i).getMinIntents());
+        }
+        return intentsJugadors;
+    }
+
+    public ArrayList<Jugador> unirDadesJugadors(ArrayList<String> nomsJugadors, ArrayList<String> intentsJugadors) {
+        ArrayList<Jugador> llistaJugadors=new ArrayList<Jugador>();
+        for(int i=0;i<nomsJugadors.size();i++){
+            llistaJugadors.add(new Jugador(nomsJugadors.get(i), intentsJugadors.get(i)));
+        }
+        return llistaJugadors;
     }
 }

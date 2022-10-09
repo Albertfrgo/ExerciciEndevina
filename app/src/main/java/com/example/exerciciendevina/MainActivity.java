@@ -25,7 +25,6 @@ public class MainActivity extends AppCompatActivity {
     boolean jocActiu=true;
     int numeroEndevinar= aleatori.nextInt(100);;
     String numEndStr=String.valueOf(numeroEndevinar);
-    //Per poder utilitzarlos primer instancia els EditText i TextView fora del onCreate i alla els defineixo
     EditText inputUsuari;
     TextView vistaContador;
     TextView vistaPista;
@@ -33,8 +32,10 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog dialeg;
     boolean partidaJugada;
 
-    boolean llistaIniciada=false;
-    ArrayList<RecordsActivity.Jugador> llistaJugadors;
+    boolean llistaIniciada;
+    ArrayList<Jugador> llistaJugadors;
+    ArrayList<String> nomsJugadors;
+    ArrayList<String> intentsJugadors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,10 +43,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Intent dadesActivity=getIntent();
-        llistaIniciada=dadesActivity.getBooleanExtra("llistaIniciada", false);
-        if(llistaIniciada==true){
-            llistaJugadors= (ArrayList<RecordsActivity.Jugador>) dadesActivity.getSerializableExtra("llistaJugadors");
+        //RECOLLIR DADES DE LA VISTA DE RECORDS
+        Intent dadesRecords=getIntent();
+        llistaIniciada=dadesRecords.getBooleanExtra("llistaIniciadaRecords", false);
+
+        if(llistaIniciada==true) {
+            nomsJugadors = dadesRecords.getStringArrayListExtra("nomsJugadors");
+            intentsJugadors = dadesRecords.getStringArrayListExtra("intentsJugadors");
+            llistaJugadors = unirDadesJugadors(nomsJugadors, intentsJugadors);
         }
 
         inputUsuari=findViewById(R.id.inputUsuari);
@@ -66,11 +71,9 @@ public class MainActivity extends AppCompatActivity {
 
 //      Es pot configurar perque mostri el numero a endevinar per probar
         vistaPista.setText("");
-
-
-
     }
 
+    //INTENTAR ENDEVINAR
     public void premerBoto(View view) {
         if(jocActiu){
             Editable numeroEntrat= inputUsuari.getText();
@@ -103,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //CANVI ACTIVITAT I ENVIAR DADES A RECORDS ACTIVITY
     public void premerRanking(View view1){
         Log.i("INFO", "S'ha apretat el boto de ranking");
         Intent obrirRecords=new Intent(this, RecordsActivity.class);
@@ -110,14 +114,63 @@ public class MainActivity extends AppCompatActivity {
         if (partidaJugada==true){
             obrirRecords.putExtra("partidaJugada", partidaJugada);
             obrirRecords.putExtra("contadorIntents", contString);
-            obrirRecords.putExtra("llistaIniciada", llistaIniciada);
-            if(llistaIniciada==true){
-                obrirRecords.putExtra("llistaJugadors", llistaJugadors);
+            obrirRecords.putExtra("llistaIniciadaMain", llistaIniciada);
+            if(llistaIniciada==true) {
+                Log.i("INFO", "La llista esta iniciada *********");
+                nomsJugadors = obtenirNoms(llistaJugadors);
+                intentsJugadors = obtenirIntents(llistaJugadors);
+                obrirRecords.putStringArrayListExtra("nomsJugadors", nomsJugadors);
+                obrirRecords.putStringArrayListExtra("intentsJugadors", intentsJugadors);
             }
         }
         startActivity(obrirRecords);
-
     }
 
+    class Jugador{
+        String nom;
+        String intents;
+
+        public Jugador(String nom, String intents){
+            this.nom=nom;
+            this.intents=intents;
+        }
+        public String getNom(){
+            return nom;
+        }
+        public String getMinIntents(){
+            return intents;
+        }
+        public int getMinimInteger(){
+            try{
+                return Integer.parseInt(intents);
+            }catch(Exception e){
+                return 0;
+            }
+        }
+    }
+
+    public ArrayList<String> obtenirNoms(ArrayList<Jugador> llistaJugadors){
+        ArrayList<String> nomsJugadors=new ArrayList<String>();
+        for(int i=0;i<llistaJugadors.size();i++){
+            nomsJugadors.add(llistaJugadors.get(i).getNom());
+        }
+        return nomsJugadors;
+    }
+
+    public ArrayList<String> obtenirIntents(ArrayList<Jugador> llistaJugadors){
+        ArrayList<String> intentsJugadors=new ArrayList<String>();
+        for(int i=0;i<llistaJugadors.size();i++){
+            intentsJugadors.add(llistaJugadors.get(i).getMinIntents());
+        }
+        return intentsJugadors;
+    }
+
+    public ArrayList<Jugador> unirDadesJugadors(ArrayList<String> nomsJugadors, ArrayList<String> intentsJugadors) {
+        ArrayList<Jugador> llistaJugadors=new ArrayList<Jugador>();
+        for(int i=0;i<nomsJugadors.size();i++){
+            llistaJugadors.add(new Jugador(nomsJugadors.get(i), intentsJugadors.get(i)));
+        }
+        return llistaJugadors;
+    }
 }
 
