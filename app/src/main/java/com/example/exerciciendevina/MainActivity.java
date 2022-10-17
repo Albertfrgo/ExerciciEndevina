@@ -20,38 +20,23 @@ import java.util.Random;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-    int contadorIntents=0;
-    Random aleatori=new Random();
-    boolean jocActiu=true;
-    int numeroEndevinar= aleatori.nextInt(100);;
-    String numEndStr=String.valueOf(numeroEndevinar);
-    EditText inputUsuari;
-    TextView vistaContador;
-    TextView vistaPista;
-    AlertDialog.Builder constructorDialeg;
-    AlertDialog dialeg;
-    boolean partidaJugada;
-
-    boolean llistaIniciada;
-    ArrayList<Jugador> llistaJugadors;
-    ArrayList<String> nomsJugadors;
-    ArrayList<String> intentsJugadors;
+    private int contadorIntents=0;
+    private Random aleatori=new Random();
+    private boolean jocActiu=true;
+    private int numeroEndevinar= aleatori.nextInt(100);;
+    private String numEndStr=String.valueOf(numeroEndevinar);
+    private EditText inputUsuari;
+    private TextView vistaContador;
+    private TextView vistaPista;
+    private AlertDialog.Builder constructorDialeg;
+    private AlertDialog dialeg;
+    private boolean partidaJugada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         partidaJugada=false;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        //RECOLLIR DADES DE LA VISTA DE RECORDS
-        Intent dadesRecords=getIntent();
-        llistaIniciada=dadesRecords.getBooleanExtra("llistaIniciadaRecords", false);
-
-        if(llistaIniciada==true) {
-            nomsJugadors = dadesRecords.getStringArrayListExtra("nomsJugadors");
-            intentsJugadors = dadesRecords.getStringArrayListExtra("intentsJugadors");
-            llistaJugadors = unirDadesJugadors(nomsJugadors, intentsJugadors);
-        }
 
         inputUsuari=findViewById(R.id.inputUsuari);
         vistaContador=findViewById(R.id.contIntents);
@@ -114,14 +99,6 @@ public class MainActivity extends AppCompatActivity {
         if (partidaJugada==true){
             obrirRecords.putExtra("partidaJugada", partidaJugada);
             obrirRecords.putExtra("contadorIntents", contString);
-            obrirRecords.putExtra("llistaIniciadaMain", llistaIniciada);
-            if(llistaIniciada==true) {
-                Log.i("INFO", "La llista esta iniciada *********");
-                nomsJugadors = obtenirNoms(llistaJugadors);
-                intentsJugadors = obtenirIntents(llistaJugadors);
-                obrirRecords.putStringArrayListExtra("nomsJugadors", nomsJugadors);
-                obrirRecords.putStringArrayListExtra("intentsJugadors", intentsJugadors);
-            }
         }
         startActivity(obrirRecords);
     }

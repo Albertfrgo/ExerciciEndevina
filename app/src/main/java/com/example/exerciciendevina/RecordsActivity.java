@@ -24,17 +24,15 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class RecordsActivity extends AppCompatActivity {
-    TextView vistaJugadors;
-    TextView ultimJoc;
-    Button botoTornar;
-    Button botoEntrar;
-    boolean jocJugat;
-    boolean llistaIniciada;
-    String ultimaPuntuacio;
+    private TextView vistaJugadors;
+    private TextView ultimJoc;
+    private Button botoTornar;
+    private Button botoEntrar;
+    private boolean jocJugat;
+    private static boolean llistaIniciada;
+    private String ultimaPuntuacio;
 
-    ArrayList<Jugador> llistaJugadors=new ArrayList<Jugador>();
-    ArrayList<String> nomsJugadors;
-    ArrayList<String> intentsJugadors;
+    private static ArrayList<Jugador> llistaJugadors=new ArrayList<Jugador>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +48,6 @@ public class RecordsActivity extends AppCompatActivity {
         //RECOLLIR DADES DE LA MAIN ACTIVITY
         Intent dadesMainAct=getIntent();
         jocJugat=dadesMainAct.getBooleanExtra("partidaJugada", false);
-        llistaIniciada=dadesMainAct.getBooleanExtra("llistaIniciadaMain", false);
 
         if(jocJugat==true){
             ultimaPuntuacio=dadesMainAct.getStringExtra("contadorIntents");
@@ -58,12 +55,8 @@ public class RecordsActivity extends AppCompatActivity {
         }else{
             ultimJoc.append(" "+"CAP RESULTAT");
         }
-        if(llistaIniciada==true){
-            nomsJugadors=dadesMainAct.getStringArrayListExtra("nomsJugadors");
-            intentsJugadors=dadesMainAct.getStringArrayListExtra("intentsJugadors");
-            llistaJugadors=unirDadesJugadors(nomsJugadors, intentsJugadors);
-        }else{
-            Log.i("INFO", "S'ha creat la llista **************************");
+        if(llistaIniciada!=true){
+            Log.i("INFO", "S'ha creat la llista");
             llistaJugadors.add(new Jugador("Irene", "7"));
             llistaJugadors.add(new Jugador("Sergio", "8"));
             llistaJugadors.add(new Jugador("Edu", "5"));
@@ -113,10 +106,6 @@ public class RecordsActivity extends AppCompatActivity {
     public void tornarJoc (View view1){
         Log.i("INFO", "S'ha apretat el boto de tornar");
         Intent obrirJoc=new Intent(RecordsActivity.this, MainActivity.class);
-        nomsJugadors=obtenirNoms(llistaJugadors);
-        intentsJugadors=obtenirIntents(llistaJugadors);
-        obrirJoc.putStringArrayListExtra("nomsJugadors", nomsJugadors);
-        obrirJoc.putStringArrayListExtra("intentsJugadors", intentsJugadors);
         obrirJoc.putExtra("llistaIniciadaRecords", llistaIniciada);
         startActivity(obrirJoc);
     }
@@ -155,14 +144,6 @@ public class RecordsActivity extends AppCompatActivity {
 
     public void mostrarJugadors(){
         vistaJugadors.setText("");
-        /*for(int i=0;i<llistaJugadors.size();i++){
-            for(int j=0;j<llistaJugadors.size();j++){
-                if(Integer.parseInt(llistaJugadors.get(j+1).getMinIntents())< Integer.parseInt(llistaJugadors.get(j).getMinIntents())){
-                    Jugador jug=llistaJugadors.get(j);
-                    llistaJugadors.set(j)=llistaJugadors.get(j+1);
-                }
-            }
-        }*/
         Collections.sort(llistaJugadors, new ordJugadorsIntents());
         for(Jugador jug:llistaJugadors){
             vistaJugadors.append(jug.getNom()+" - "+jug.getMinIntents()+"\n\n");
